@@ -30,3 +30,6 @@ dd { margin-left: 0; }
 .endpoint-marker { display: grid; place-items: center; border: 2px solid white; border-radius: 50%; color: white; font: bold 18px system-ui; box-shadow: 0 1px 5px #0008; }
 .endpoint-start { background: #18594b; }
 .endpoint-destination { background: #803524; border-radius: 4px; }
+button:disabled { opacity: 0.55; cursor: default; }
+#route-status { min-height: 1.6em; }
+.routing-source { font-size: 0.85rem; }

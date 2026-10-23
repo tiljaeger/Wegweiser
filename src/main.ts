@@ -1,9 +1,10 @@
-import { map, tileLayer, control, marker, divIcon } from 'leaflet';
+import { map, tileLayer, control, marker, divIcon, polyline } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './style.css';
 import { emptySelection, selectPoint, selectionHelp } from './selection';
 import type { Endpoint, Point } from './selection';
-import type { Marker } from 'leaflet';
+import { createRouteRequest } from './route-request';
+import type { Marker, Polyline } from 'leaflet';
 
 const status = document.querySelector<HTMLParagraphElement>('#app-status');
 const container = document.querySelector<HTMLDivElement>('#map');
@@ -36,6 +37,25 @@ if (container && status) {
   const radios = document.querySelectorAll<HTMLInputElement>('input[name="endpoint"]');
   const help = document.querySelector<HTMLParagraphElement>('#selection-help')!;
 
+  const routeButton = document.querySelector<HTMLButtonElement>('#calculate-route')!;
+  const routeStatus = document.querySelector<HTMLParagraphElement>('#route-status')!;
+  let routeLine: Polyline | null = null;
+  const routing = createRouteRequest(({ loading, result, error }) => {
+    routeLine?.remove();
+    routeLine = null;
+    routeButton.disabled = loading || !selection.start || !selection.destination;
+    routeStatus.textContent = loading ? 'Die Autoroute wird berechnet.' : error ?? '';
+    if (result) {
+      routeLine = polyline(result.coordinates.map(([lng, lat]) => [lat, lng]), { color: '#174caa', weight: 5 }).addTo(leafletMap);
+      leafletMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+      const minutes = Math.max(1, Math.round(result.duration / 60));
+      routeStatus.textContent = `Entfernung: ${(result.distance / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} km. Geschätzte Fahrtdauer: ${Math.floor(minutes / 60)} Std. ${minutes % 60} Min. (ohne aktuellen Verkehr).`;
+    }
+  });
+  routeButton.addEventListener('click', () => {
+    if (selection.start && selection.destination) void routing.calculate(selection.start, selection.destination);
+  });
+
   function renderSelection() {
     for (const endpoint of ['start', 'destination'] as const) {
       const point = selection[endpoint];
@@ -63,7 +83,8 @@ if (container && status) {
   }
 
   function setPoint(point: Point) {
-    selection = selectPoint(selection, point);
+    selection = selectPoint(selection, { lat: point.lat, lng: ((point.lng + 180) % 360 + 360) % 360 - 180 });
+    routing.clear();
     renderSelection();
   }
 
@@ -79,9 +100,11 @@ if (container && status) {
   document.querySelector('#use-center')!.addEventListener('click', () => setPoint(leafletMap.getCenter()));
   document.querySelector('#reset-selection')!.addEventListener('click', () => {
     selection = emptySelection();
+    routing.clear();
     renderSelection();
   });
   renderSelection();
+  routing.clear();
 
   const resizeObserver = new ResizeObserver(() => leafletMap.invalidateSize());
   resizeObserver.observe(container);
