@@ -26,7 +26,50 @@ OpenStreetMap liefert Kartendaten, keine eigene Routing-API. Kartenkacheln und R
 
 ## Entwicklungsstand
 
-Die Projektplanung und Arbeitsregeln sind vorbereitet. Anwendung, Build, Tests, GitHub Actions und Cloudflare-Deployment werden in den nächsten Issues eingerichtet. Es existieren noch keine ausführbaren npm-Befehle.
+Das TypeScript/Vite-Grundgerüst enthält eine einfache Startseite und einen Cloudflare Worker, der die gebauten Dateien ausliefert. Karte und Routing folgen in den nächsten Issues. Fachliche Tests kommen mit diesen Funktionen hinzu.
+
+## Einrichtung und lokale Entwicklung
+
+Voraussetzung: Node.js 24 LTS mit npm (siehe `.nvmrc`).
+
+```sh
+npm ci
+npm run dev
+```
+
+Vite startet den Frontend-Entwicklungsserver auf `http://127.0.0.1:5173` mit automatischer Aktualisierung bei Änderungen.
+
+Für die lokale Prüfung einschließlich Cloudflare Worker:
+
+```sh
+npm run dev:worker
+```
+
+Wrangler baut das Frontend automatisch und liefert die Dateien auf `http://127.0.0.1:8787` aus. Änderungen unter `src/` lösen einen Neubau aus; nach Änderungen an `index.html` den Worker-Entwicklungsserver neu starten. Beide Entwicklungsserver mit Strg+C beenden.
+
+## Build und Prüfungen
+
+```sh
+npm run typecheck
+npm run lint
+npm run build
+npm run build:worker
+```
+
+- `typecheck` prüft Frontend und Worker mit getrennten TypeScript-Umgebungen.
+- `lint` prüft JavaScript und TypeScript mit ESLint.
+- `build` erstellt das Frontend unter `dist/`.
+- `build:worker` baut das Frontend erneut und bündelt den Worker unter `.wrangler/build/`, ohne etwas zu veröffentlichen. Dafür sind keine Cloudflare-Zugangsdaten erforderlich.
+
+GitHub Actions führt bei Pull Requests und Änderungen auf `main` die Installation, Typprüfung, Linting und `build:worker` aus. Letzteres enthält den Produktionsbuild. Die CI veröffentlicht nichts und benötigt keine Secrets.
+
+## Projektaufbau
+
+- `index.html`, `src/`: Frontend und Styles.
+- `worker/index.ts`: Weiterleitung an Cloudflare Static Assets.
+- `wrangler.jsonc`: Worker-Konfiguration und automatischer Frontend-Build.
+- `.github/workflows/ci.yml`: automatische Prüfungen.
+- `package-lock.json`: festgeschriebene Abhängigkeiten; Installation mit `npm ci`.
 
 ## Arbeitsablauf
 
@@ -40,4 +83,12 @@ Die ersten fünf Arbeitspakete stehen in [docs/issues.md](docs/issues.md). Regel
 
 ## Veröffentlichung
 
-Ziel ist ein einzelnes Cloudflare-Workers-Projekt. GitHub Actions soll zunächst Änderungen prüfen. Vorschau und Produktion werden getrennt konfiguriert. Zugangsdaten werden ausschließlich als Secrets hinterlegt; sie gehören nicht ins Repository.
+Ziel ist ein einzelnes Cloudflare-Workers-Projekt. Ein manueller Deploy ist vorbereitet:
+
+```sh
+npm run deploy
+```
+
+Dieser Befehl baut das Frontend und veröffentlicht den Worker `wegweiser` samt statischen Dateien. Er benötigt eine autorisierte Cloudflare-Umgebung, beispielsweise mit `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID`. Zugangsdaten werden ausschließlich als Secrets hinterlegt; sie gehören nicht ins Repository. `.env*` und `.dev.vars*` sind von Git ausgeschlossen (ausgenommen eine wertfreie `.env.example`). Frontend-Variablen mit `VITE_` sind öffentlich und dürfen keine Secrets enthalten.
+
+Vorschau, automatische Veröffentlichung und Branchschutz folgen in Issue #5. Es ist bisher kein Cloudflare-Deployment für dieses Projekt eingerichtet.

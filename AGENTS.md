@@ -21,7 +21,10 @@
 
 ## Prüfung und Abschluss
 
-- Vorhandene Build-, Typprüfungs-, Lint- und relevante Testbefehle aus package.json nutzen, sobald eingerichtet.
+- Node.js 24 verwenden; Abhängigkeiten mit `npm ci` installieren.
+- Vor Abschluss `npm run typecheck`, `npm run lint` und `npm run build:worker` ausführen. Der Worker-Dry-Run enthält den Frontend-Build und veröffentlicht nichts.
+- `npm run dev` startet das Frontend, `npm run dev:worker` die lokale Worker-Umgebung.
+- `npm run deploy` veröffentlicht auf Cloudflare; für reine Build-Prüfungen den Dry-Run verwenden.
 - Relevante Tests für Routing-Validierung, Fehlerverhalten und Auswahlzustände ergänzen.
 - Reine Dokumentationsänderungen benötigen keine neuen Tests.
 - Durchgeführte Prüfungen und offene Einschränkungen im Pull Request nennen.
