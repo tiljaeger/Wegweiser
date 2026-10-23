@@ -26,7 +26,7 @@ OpenStreetMap liefert Kartendaten, keine eigene Routing-API. Kartenkacheln und R
 
 ## Entwicklungsstand
 
-Das TypeScript/Vite-Grundgerüst enthält eine einfache Startseite und einen Cloudflare Worker, der die gebauten Dateien ausliefert. Karte und Routing folgen in den nächsten Issues. Fachliche Tests kommen mit diesen Funktionen hinzu.
+Die Anwendung zeigt eine verschiebbare und zoombare OpenStreetMap-Karte mit Leaflet. Ein Cloudflare Worker liefert die gebauten Dateien aus. Start-/Zielauswahl und Routing folgen in den nächsten Issues.
 
 ## Einrichtung und lokale Entwicklung
 
@@ -92,3 +92,16 @@ npm run deploy
 Dieser Befehl baut das Frontend und veröffentlicht den Worker `wegweiser` samt statischen Dateien. Er benötigt eine autorisierte Cloudflare-Umgebung, beispielsweise mit `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID`. Zugangsdaten werden ausschließlich als Secrets hinterlegt; sie gehören nicht ins Repository. `.env*` und `.dev.vars*` sind von Git ausgeschlossen (ausgenommen eine wertfreie `.env.example`). Frontend-Variablen mit `VITE_` sind öffentlich und dürfen keine Secrets enthalten.
 
 Vorschau, automatische Veröffentlichung und Branchschutz folgen in Issue #5. Es ist bisher kein Cloudflare-Deployment für dieses Projekt eingerichtet.
+
+## Karte und Kachelanbieter
+
+Die Karte verwendet Leaflet und die Standard-Rasterkacheln von OpenStreetMap über `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, maximal Zoomstufe 19. Die Startansicht zeigt Deutschland. Die Karte unterstützt Maus, Touch und Tastatur und passt sich Größenänderungen an.
+
+Für den zunächst kleinen Projektbetrieb ist der öffentliche OSM-Kacheldienst vorgesehen. Es gelten die [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) und die [Copyright- und Lizenzhinweise](https://www.openstreetmap.org/copyright). Die Attribution bleibt sowohl im Kartenbereich als auch unterhalb der Karte sichtbar.
+
+- Kacheln werden direkt im Browser angefordert; der normale HTTP-Referer darf nicht unterdrückt werden.
+- Browser-Caching gemäß Server-Headern beibehalten; keine Cache-Umgehung, Massendownloads, Vorabdownloads oder Offline-Pakete einbauen.
+- Der öffentliche Dienst hat begrenzte Kapazität und keine Verfügbarkeitsgarantie; vor größerem Nutzungsaufkommen einen geeigneten kommerziellen Anbieter oder eigene Infrastruktur wählen.
+- Beim Laden übermittelt der Browser technisch erforderliche Verbindungsdaten an OpenStreetMap; siehe [OSMF-Datenschutzrichtlinie](https://osmfoundation.org/wiki/Privacy_Policy).
+
+Für die Kartenanzeige ist kein API-Schlüssel erforderlich. Die Kachelanbindung berechnet keine Routen.
