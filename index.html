@@ -22,12 +22,15 @@
         <p id="selection-help" role="status"></p>
         <div class="selection-actions">
           <button id="use-center" type="button">Kartenmitte übernehmen</button>
+          <button id="calculate-route" type="button" disabled>Autoroute berechnen</button>
           <button id="reset-selection" type="button">Auswahl zurücksetzen</button>
         </div>
         <dl aria-label="Ausgewählte Punkte">
           <dt>Start</dt><dd id="start-value">Noch nicht ausgewählt</dd>
           <dt>Ziel</dt><dd id="destination-value">Noch nicht ausgewählt</dd>
         </dl>
+        <p id="route-status" role="status" aria-live="polite"></p>
+        <p class="routing-source">Routing: <a href="https://project-osrm.org/">OSRM</a> · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
         <p id="app-status" role="status">Die Karte wird geladen.</p>
         <div id="map" tabindex="0" role="region" aria-label="Interaktive OpenStreetMap-Karte" aria-describedby="map-help selection-help"></div>
         <p class="map-source">Kartendaten: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a>. Kartenkacheln: OpenStreetMap.</p>

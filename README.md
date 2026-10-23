@@ -19,14 +19,14 @@ Die erste Version dient der Routenplanung. GPS-Navigation, Abbiegehinweise, Verk
 - TypeScript und Vite für die Web-App.
 - Leaflet zur Darstellung der Karte; OpenStreetMap als Kartendatenquelle.
 - Cloudflare Workers mit Static Assets für Frontend und einen API-Endpunkt zur Routenberechnung.
-- Ein Routingdienst mit Autoprofil; der Anbieter ist vor Umsetzung der Routing-Anbindung auszuwählen.
+- OSRM-Demodienst mit Autoprofil über einen festen Worker-Endpunkt.
 - Für die erste Version keine Datenbank und keine Benutzerkonten.
 
 OpenStreetMap liefert Kartendaten, keine eigene Routing-API. Kartenkacheln und Routing benötigen passende Anbieter. Vor deren Einbindung sind Nutzungsbedingungen, Attribution, Limits und mögliche Kosten zu prüfen. Öffentliche Demo-Dienste sind keine zugesicherte Produktionsinfrastruktur. API-Schlüssel gehören in Worker-Secrets.
 
 ## Entwicklungsstand
 
-Die Anwendung zeigt eine verschiebbare und zoombare OpenStreetMap-Karte mit Leaflet. Ein Cloudflare Worker liefert die gebauten Dateien aus. Start und Ziel lassen sich explizit auswählen, per Kartenklick oder über die Kartenmitte setzen und zurücksetzen. Marker und Koordinaten kennzeichnen beide Punkte. Die Routenberechnung folgt separat; es gibt derzeit keine Route oder Routenergebnisse, die beim Ändern oder Zurücksetzen entfernt werden müssten.
+Die Anwendung zeigt eine verschiebbare und zoombare OpenStreetMap-Karte mit Leaflet. Ein Cloudflare Worker liefert die gebauten Dateien aus. Start und Ziel lassen sich explizit auswählen, per Kartenklick oder über die Kartenmitte setzen und zurücksetzen. Marker und Koordinaten kennzeichnen beide Punkte. Eine Autoroute kann über „Autoroute berechnen“ angefordert werden. Änderungen an Start oder Ziel und Zurücksetzen entfernen die alte Route samt Ergebnis und brechen laufende Anfragen ab.
 
 ## Einrichtung und lokale Entwicklung
 
@@ -106,3 +106,20 @@ Für den zunächst kleinen Projektbetrieb ist der öffentliche OSM-Kacheldienst 
 - Beim Laden übermittelt der Browser technisch erforderliche Verbindungsdaten an OpenStreetMap; siehe [OSMF-Datenschutzrichtlinie](https://osmfoundation.org/wiki/Privacy_Policy).
 
 Für die Kartenanzeige ist kein API-Schlüssel erforderlich. Die Kachelanbindung berechnet keine Routen.
+
+
+## Autorouting (Issue #4)
+
+`POST /api/route` erwartet JSON mit `start` und `destination`, jeweils `{ "lat": 48.1, "lng": 7.2 }`. Der Worker akzeptiert ausschließlich endliche numerische Koordinaten innerhalb ±90° Breite und ±180° Länge und höchstens 1024 Byte Eingabe. Er fragt ausschließlich `https://router.project-osrm.org/route/v1/driving/…` ab, folgt keinen Weiterleitungen und beendet die Anfrage nach 10 Sekunden. Antworten enthalten Meter, Sekunden und den GeoJSON-Linienverlauf als Koordinatenliste; sie werden nicht zwischengespeichert. Fehler verwenden 400/413/415 für Eingaben, 404 für fehlende Routen und 502 für Dienstfehler oder Timeout. Andere Methoden erhalten 405.
+
+Gewählt ist zunächst der öffentliche **OSRM-Demodienst**, Profil `driving` (Auto), mit OpenStreetMap-Daten. Er benötigt keinen API-Schlüssel; derzeit entstehen keine API-Abonnementkosten. Er bietet keine zugesicherte Verfügbarkeit, Datenaktualität oder garantierte Anfragekapazität. Es gibt hier keinen gebuchten Tarif und kein garantiertes Kontingent. Routenergebnisse und Fahrtdauer berücksichtigen keinen aktuellen Verkehr. Die Oberfläche nennt OSRM und OpenStreetMap als Quellen.
+
+Bedingungen und Grenzen:
+
+- [OSRM API usage policy](https://github.com/Project-OSRM/osrm-backend/wiki/Api-usage-policy) verweist für den aktuellen Demobetrieb auf [Betreiberinformationen](https://routing.openstreetmap.de/about.html) und [FOSSGIS-Nutzungsbedingungen](https://www.fossgis.de/arbeitsgruppen/osm-server/nutzungsbedingungen/).
+- Die OSRM-Seite nennt als weiterhin gute Praxis: keine übermäßige Nutzung, identifizierbarer User-Agent und sichtbare OSRM-/ODbL-Attribution. Der Worker sendet `Wegweiser/0.1` mit Repository-Link als User-Agent. Zugriff kann entzogen werden; keine Weitervermarktung des Dienstzugangs.
+- Es wird nur auf ausdrücklichen Knopfdruck gerechnet, mit höchstens einer laufenden Anfrage je Browser. Keine automatischen Wiederholungen, Hintergrundabfragen oder Massenberechnungen. Dies begrenzt nicht die aggregierte Nutzung aller Besucher.
+- Die aktuellen Betreiberseiten konnten aus der Entwicklungsumgebung nicht abgerufen werden (HTTP 403); aktuelle numerische Limits und weitere Bedingungen sind deshalb vor einem produktiven Deployment zu prüfen. Dieser PR veröffentlicht nichts. Vor größerem Nutzungsaufkommen sind ein vertraglich geeigneter Anbieter oder eine eigene OSRM-Instanz und ein serverseitiges Nutzungslimit erforderlich.
+- Vollständige Routenkoordinaten und Zugangsdaten werden nicht geloggt oder dauerhaft gespeichert. Zur Berechnung werden Start und Ziel an OSRM übertragen. Wenn später ein Anbieter mit Schlüssel verwendet wird, gehört dieser ausschließlich in Worker-Secrets.
+
+Für lokale Routingtests `npm run dev:worker` verwenden. Alternativ kann Vite parallel laufen und leitet `/api` über `vite.config.ts` an den lokalen Worker auf Port 8787 weiter. Automatische Tests verwenden ausschließlich simulierte Anbieterantworten und benötigen keinen externen Routingzugriff.
