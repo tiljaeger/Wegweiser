@@ -19,3 +19,14 @@ section { margin-top: 2rem; padding: clamp(0.75rem, 2vw, 1.5rem); background: wh
 .map-source { margin-bottom: 0; font-size: 0.85rem; }
 .leaflet-control-attribution { max-width: calc(100vw - 5rem); overflow-wrap: anywhere; }
 .leaflet-control-zoom a { min-width: 44px; min-height: 44px; line-height: 44px; }
+
+fieldset { border: 1px solid #cddbd1; border-radius: 0.5rem; }
+fieldset label { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; margin-right: 1.5rem; cursor: pointer; }
+.selection-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+button { font: inherit; color: inherit; background: #f4f7f2; border: 1px solid #356456; border-radius: 0.5rem; padding: 0.5rem 1rem; min-height: 44px; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid #18594b; outline-offset: 3px; }
+dt { font-weight: 700; }
+dd { margin-left: 0; }
+.endpoint-marker { display: grid; place-items: center; border: 2px solid white; border-radius: 50%; color: white; font: bold 18px system-ui; box-shadow: 0 1px 5px #0008; }
+.endpoint-start { background: #18594b; }
+.endpoint-destination { background: #803524; border-radius: 4px; }

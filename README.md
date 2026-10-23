@@ -26,7 +26,7 @@ OpenStreetMap liefert Kartendaten, keine eigene Routing-API. Kartenkacheln und R
 
 ## Entwicklungsstand
 
-Die Anwendung zeigt eine verschiebbare und zoombare OpenStreetMap-Karte mit Leaflet. Ein Cloudflare Worker liefert die gebauten Dateien aus. Start-/Zielauswahl und Routing folgen in den nächsten Issues.
+Die Anwendung zeigt eine verschiebbare und zoombare OpenStreetMap-Karte mit Leaflet. Ein Cloudflare Worker liefert die gebauten Dateien aus. Start und Ziel lassen sich explizit auswählen, per Kartenklick oder über die Kartenmitte setzen und zurücksetzen. Marker und Koordinaten kennzeichnen beide Punkte. Die Routenberechnung folgt separat; es gibt derzeit keine Route oder Routenergebnisse, die beim Ändern oder Zurücksetzen entfernt werden müssten.
 
 ## Einrichtung und lokale Entwicklung
 
@@ -50,6 +50,7 @@ Wrangler baut das Frontend automatisch und liefert die Dateien auf `http://127.0
 ## Build und Prüfungen
 
 ```sh
+npm test
 npm run typecheck
 npm run lint
 npm run build
