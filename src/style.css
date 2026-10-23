@@ -7,9 +7,15 @@
 }
 
 body { margin: 0; }
-main { max-width: 52rem; margin: 0 auto; padding: clamp(1.5rem, 6vw, 5rem); }
+main { max-width: 76rem; margin: 0 auto; padding: clamp(1rem, 3vw, 3rem); }
 h1 { font-size: clamp(2.5rem, 8vw, 4rem); line-height: 1.1; margin: 1rem 0; }
 h2 { font-size: 1.3rem; }
+a { color: #18594b; }
 .eyebrow { font-weight: 650; color: #356456; }
-section { margin-top: 2.5rem; padding: 1.5rem; background: white; border: 1px solid #cddbd1; border-radius: 1rem; }
-#app-status { font-weight: 600; }
+section { margin-top: 2rem; padding: clamp(0.75rem, 2vw, 1.5rem); background: white; border: 1px solid #cddbd1; border-radius: 1rem; }
+#app-status { min-height: 1.6em; }
+#map { width: 100%; height: clamp(20rem, 62dvh, 48rem); background: #e4ece3; border-radius: 0.5rem; }
+#map:focus-visible { outline: 3px solid #18594b; outline-offset: 3px; }
+.map-source { margin-bottom: 0; font-size: 0.85rem; }
+.leaflet-control-attribution { max-width: calc(100vw - 5rem); overflow-wrap: anywhere; }
+.leaflet-control-zoom a { min-width: 44px; min-height: 44px; line-height: 44px; }

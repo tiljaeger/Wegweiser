@@ -11,10 +11,12 @@
       <p class="eyebrow">Routenplanung mit OpenStreetMap</p>
       <h1>Wegweiser</h1>
       <p>Dein Weg von Start zu Ziel.</p>
-      <section aria-labelledby="status-title">
-        <h2 id="status-title">Hier entsteht dein Routenplaner</h2>
-        <p>Als Nächstes folgen die Karte, die Auswahl von Start und Ziel und die Berechnung deiner Autoroute.</p>
-        <p id="app-status" role="status">Die Anwendung wird geladen.</p>
+      <section aria-labelledby="map-title">
+        <h2 id="map-title">Entdecke die Karte</h2>
+        <p id="map-help">Verschiebe die Karte mit der Maus oder einem Finger. Nutze die Plus- und Minus-Tasten zum Zoomen. Mit der Tastatur: Karte fokussieren und Pfeiltasten sowie + und − verwenden.</p>
+        <p id="app-status" role="status">Die Karte wird geladen.</p>
+        <div id="map" tabindex="0" role="region" aria-label="Interaktive OpenStreetMap-Karte" aria-describedby="map-help"></div>
+        <p class="map-source">Kartendaten: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a>. Kartenkacheln: OpenStreetMap.</p>
       </section>
       <noscript>Bitte aktiviere JavaScript, um die interaktive Anwendung zu verwenden.</noscript>
     </main>
